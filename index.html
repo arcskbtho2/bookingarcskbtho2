@@ -1,1 +1,441 @@
-SISTEM TEMPAHAN PUSAT SUMBER SKBTHO2
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Pengurusan Tempahan Fasiliti • SKBTHO2</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            400: '#FACC15',
+                            500: '#EAB308',
+                            600: '#CA8A04',
+                            custom: '#D4AF37',
+                            light: '#F3E5AB',
+                            dark: '#AA7C11'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0A0A0A;
+            color: #E5E7EB;
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #FFF5C0 0%, #D4AF37 50%, #AA7C11 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gold-border {
+            border-color: #D4AF37;
+        }
+        .gold-bg {
+            background-color: #D4AF37;
+        }
+        /* Custom Scrollbar for TV Ticker */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #121212;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D4AF37;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between bg-black text-gray-100 selection:bg-yellow-500 selection:text-black">
+
+    <!-- Header Korporat Hitam & Emas -->
+    <header class="bg-zinc-950 border-b border-yellow-600/40 py-4 px-6 shadow-2xl sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-yellow-400 to-yellow-700 flex items-center justify-center shadow-lg shadow-yellow-600/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-extrabold tracking-wide gold-gradient-text">SK BANDAR TUN HUSSEIN ONN 2</h1>
+                    <p class="text-xs text-yellow-500/80 font-medium tracking-widest uppercase">Sistem Tempahan Fasiliti & Papan Paparan</p>
+                </div>
+            </div>
+            <!-- Butang Navigasi Mod -->
+            <div class="flex bg-zinc-900 p-1 rounded-xl border border-yellow-600/30">
+                <button id="btnTabBorang" onclick="switchTab('borang')" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all duration-300 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black shadow-md">
+                    📝 Borang Tempahan
+                </button>
+                <button id="btnTabTv" onclick="switchTab('tv')" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all duration-300 text-yellow-400 hover:text-white">
+                    📺 Paparan TV Live
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Kandungan Utama -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 py-8">
+
+        <!-- VIEW 1: BORANG TEMPAHAN (Mesra Telefon Pintar) -->
+        <section id="viewBorang" class="space-y-6">
+            <div class="max-w-2xl mx-auto bg-zinc-950/80 backdrop-blur-md border border-yellow-600/30 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600"></div>
+                
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-bold gold-gradient-text">Tempahan Fasiliti Sekolah</h2>
+                    <p class="text-xs text-zinc-400 mt-1">Sila lengkapkan maklumat tempahan di bawah dengan tepat.</p>
+                </div>
+
+                <form id="bookingForm" onsubmit="handleFormSubmit(event)" class="space-y-5">
+                    <!-- Nama Guru (Auto Uppercase) -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-yellow-400 mb-2">Nama Penuh Guru</label>
+                        <input type="text" id="namaGuru" required oninput="this.value = this.value.toUpperCase()" placeholder="Cth: AHMAD BIN ALI" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-sm font-medium transition-all">
+                    </div>
+
+                    <!-- Pilihan Fasiliti -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-yellow-400 mb-2">Pilih Fasiliti</label>
+                        <select id="fasiliti" required onchange="filterSlots()" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-sm font-medium transition-all">
+                            <option value="" disabled selected>-- Sila Pilih Fasiliti --</option>
+                            <option value="Bilik Tayang">Bilik Tayang</option>
+                            <option value="Pusat Sumber Sekolah">Pusat Sumber Sekolah</option>
+                            <option value="Studio TVPSS">Studio TVPSS</option>
+                        </select>
+                    </div>
+
+                    <!-- Tarikh Tempahan -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-yellow-400 mb-2">Tarikh Tempahan</label>
+                        <input type="date" id="tarikhTempahan" required class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-sm font-medium transition-all">
+                    </div>
+
+                    <!-- Grid Masa Mula & Tamat -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-yellow-400 mb-2">Masa Mula</label>
+                            <select id="masaMula" required class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-sm font-medium transition-all">
+                                <option value="" disabled selected>-- Pilih Masa Mula --</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-yellow-400 mb-2">Masa Tamat</label>
+                            <select id="masaTamat" required class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 text-sm font-medium transition-all">
+                                <option value="" disabled selected>-- Pilih Masa Tamat --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Butang Hantar -->
+                    <div class="pt-4">
+                        <button type="submit" id="btnSubmit" class="w-full py-4 rounded-xl bg-gradient-to-r from-yellow-500 via-yellow-400 to-yellow-600 text-black font-extrabold uppercase tracking-wider hover:opacity-95 transition-all shadow-lg shadow-yellow-500/25 flex items-center justify-center space-x-2">
+                            <span>Hantar Tempahan</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- VIEW 2: PAPARAN TV LIVE (Digital Signage 20 Inci dengan Auto-Scroll) -->
+        <section id="viewTv" class="hidden space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-center bg-zinc-950 border border-yellow-600/30 rounded-2xl p-6 shadow-2xl gap-4">
+                <div>
+                    <h2 class="text-2xl font-extrabold gold-gradient-text">JADUAL TEMPAHAN FASILITI SEMASA</h2>
+                    <p class="text-xs text-zinc-400 mt-1">Papan paparan langsung untuk rujukan harian warga sekolah.</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="bg-zinc-900 border border-yellow-600/40 px-4 py-2 rounded-xl text-yellow-400 font-mono text-sm font-bold shadow-inner" id="liveClock">
+                        00:00:00
+                    </div>
+                    <button onclick="fetchBookings()" class="p-2 rounded-xl bg-zinc-900 border border-yellow-600/40 text-yellow-400 hover:bg-yellow-500 hover:text-black transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Kontena Auto-Scroll untuk Paparan TV -->
+            <div class="bg-zinc-950 border border-yellow-600/30 rounded-2xl overflow-hidden shadow-2xl relative" style="height: 520px;">
+                <div id="tvScrollContainer" class="absolute inset-0 overflow-y-auto p-4 sm:p-6 space-y-4">
+                    <!-- Senarai kad tempahan akan dimasukkan secara dinamik di sini -->
+                    <div class="text-center py-20 text-zinc-500 font-medium">Memuatkan senarai tempahan...</div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL POPUP TAHNIAH (Backdrop Blur Center Popup) -->
+    <div id="successModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden transition-all duration-300">
+        <div class="bg-zinc-950 border-2 border-yellow-500 rounded-3xl p-8 max-w-md w-full mx-4 text-center shadow-2xl transform scale-95 transition-transform duration-300" id="successModalContent">
+            <div class="w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-yellow-500/40">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+            <h3 class="text-2xl font-black gold-gradient-text mb-2">TAHNIAH!</h3>
+            <p class="text-zinc-300 text-sm mb-6">Tempahan fasiliti anda telah berjaya dihantar dan direkodkan ke dalam sistem.</p>
+            <button onclick="closeSuccessModal()" class="w-full py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black font-bold uppercase rounded-xl tracking-wider hover:opacity-95 transition-all shadow-lg shadow-yellow-500/20">
+                Teruskan
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer Rasmi -->
+    <footer class="bg-zinc-950 border-t border-yellow-600/30 py-4 px-6 text-center text-xs font-semibold tracking-wider text-yellow-500/80">
+        © 2026 AL-GHAZALI RESOURCES CENTER • SK BANDAR TUN HUSSEIN ONN 2
+    </footer>
+
+    <!-- Skrip JavaScript -->
+    <script>
+        // MASUKKAN URL GOOGLE APPS SCRIPT ANDA DI SINI
+        const WEB_APP_URL = ""; 
+
+        // 22 Slot Masa Rasmi Termasuk 12.50 Tengah Hari
+        const ALL_SLOTS = [
+            "07.30 Pagi", "07.50 Pagi", "08.10 Pagi", "08.30 Pagi", "08.50 Pagi", 
+            "09.10 Pagi", "09.30 Pagi", "09.50 Pagi", "10.20 Pagi", "10.40 Pagi", 
+            "11.00 Pagi", "11.20 Pagi", "11.40 Pagi", "12.00 Tengah Hari", "12.20 Tengah Hari", 
+            "12.50 Tengah Hari", "01.30 Petang", "02.00 Petang", "02.30 Petang", 
+            "03.00 Petang", "03.30 Petang", "04.00 Petang"
+        ];
+
+        // Slot yang disekat khusus untuk Pusat Sumber Sekolah
+        const BLOCKED_PSS_SLOTS = ["09.30 Pagi", "09.50 Pagi", "10.20 Pagi", "02.30 Petang", "03.00 Petang", "03.30 Petang"];
+
+        // Tetapkan tarikh hari ini secara default pada input tarikh
+        document.addEventListener("DOMContentLoaded", () => {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('tarikhTempahan').value = today;
+            populateTimeSlots();
+            setInterval(updateLiveClock, 1000);
+            updateLiveClock();
+
+            // Jalankan auto-scroll gelung untuk paparan TV setiap 30ms
+            initAutoScroll();
+        });
+
+        // Paparkan masa live pada TV header
+        function updateLiveClock() {
+            const now = new Date();
+            document.getElementById('liveClock').innerText = now.toLocaleTimeString('ms-MY');
+        }
+
+        // Jana pilihan slot masa
+        function populateTimeSlots(disabledSlots = []) {
+            const mulaSelect = document.getElementById('masaMula');
+            const tamatSelect = document.getElementById('masaTamat');
+            
+            mulaSelect.innerHTML = '<option value="" disabled selected>-- Pilih Masa Mula --</option>';
+            tamatSelect.innerHTML = '<option value="" disabled selected>-- Pilih Masa Tamat --</option>';
+
+            ALL_SLOTS.forEach(slot => {
+                const isDisabled = disabledSlots.includes(slot);
+                
+                const opt1 = document.createElement('option');
+                opt1.value = slot;
+                opt1.textContent = slot + (isDisabled ? ' (Disekat)' : '');
+                if (isDisabled) {
+                    opt1.disabled = true;
+                    opt1.className = 'text-zinc-600 bg-zinc-900';
+                }
+                mulaSelect.appendChild(opt1);
+
+                const opt2 = document.createElement('option');
+                opt2.value = slot;
+                opt2.textContent = slot + (isDisabled ? ' (Disekat)' : '');
+                if (isDisabled) {
+                    opt2.disabled = true;
+                    opt2.className = 'text-zinc-600 bg-zinc-900';
+                }
+                tamatSelect.appendChild(opt2);
+            });
+        }
+
+        // Penapisan slot mengikut fasiliti
+        function filterSlots() {
+            const fasiliti = document.getElementById('fasiliti').value;
+            if (fasiliti === "Pusat Sumber Sekolah") {
+                populateTimeSlots(BLOCKED_PSS_SLOTS);
+            } else {
+                populateTimeSlots([]);
+            }
+        }
+
+        // Tukar Tab Paparan (Borang / TV)
+        function switchTab(tab) {
+            const viewBorang = document.getElementById('viewBorang');
+            const viewTv = document.getElementById('viewTv');
+            const btnTabBorang = document.getElementById('btnTabBorang');
+            const btnTabTv = document.getElementById('btnTabTv');
+
+            if (tab === 'borang') {
+                viewBorang.classList.remove('hidden');
+                viewTv.classList.add('hidden');
+                btnTabBorang.className = "px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all duration-300 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black shadow-md";
+                btnTabTv.className = "px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all duration-300 text-yellow-400 hover:text-white";
+            } else {
+                viewBorang.classList.add('hidden');
+                viewTv.classList.remove('hidden');
+                btnTabTv.className = "px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all duration-300 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black shadow-md";
+                btnTabBorang.className = "px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all duration-300 text-yellow-400 hover:text-white";
+                fetchBookings();
+            }
+        }
+
+        // Hantar Borang Tempahan
+        async function handleFormSubmit(event) {
+            event.preventDefault();
+
+            const submitBtn = document.getElementById('btnSubmit');
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Menghantar...";
+
+            const formData = {
+                nama: document.getElementById('namaGuru').value.trim(),
+                fasiliti: document.getElementById('fasiliti').value,
+                tarikh: document.getElementById('tarikhTempahan').value,
+                masaMula: document.getElementById('masaMula').value,
+                masaTamat: document.getElementById('masaTamat').value
+            };
+
+            // Simpan secara lokal untuk paparan demo segera
+            saveLocalBooking(formData);
+
+            // Jika WEB_APP_URL telah diisi, hantar ke Google Sheets
+            if (WEB_APP_URL) {
+                try {
+                    await fetch(WEB_APP_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+                } catch (err) {
+                    console.error("Ralat menghantar ke Google Sheets:", err);
+                }
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Hantar Tempahan";
+
+            // Paparkan Modal Tahniah (Backdrop Blur Center Popup)
+            showSuccessModal();
+            document.getElementById('bookingForm').reset();
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('tarikhTempahan').value = today;
+            populateTimeSlots();
+        }
+
+        function showSuccessModal() {
+            const modal = document.getElementById('successModal');
+            const content = document.getElementById('successModalContent');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeSuccessModal() {
+            const modal = document.getElementById('successModal');
+            const content = document.getElementById('successModalContent');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+        }
+
+        // Simulasi / Pengurusan Data Tempatan untuk Paparan TV
+        function saveLocalBooking(data) {
+            let bookings = JSON.parse(localStorage.getItem('skbtho2_bookings') || '[]');
+            bookings.unshift({
+                timestamp: new Date().toLocaleString(),
+                ...data
+            });
+            localStorage.setItem('skbtho2_bookings', JSON.stringify(bookings));
+        }
+
+        async function fetchBookings() {
+            let bookings = [];
+            if (WEB_APP_URL) {
+                try {
+                    const response = await fetch(WEB_APP_URL);
+                    bookings = await response.json();
+                } catch (err) {
+                    bookings = JSON.parse(localStorage.getItem('skbtho2_bookings') || '[]');
+                }
+            } else {
+                bookings = JSON.parse(localStorage.getItem('skbtho2_bookings') || '[]');
+            }
+
+            renderTvDisplay(bookings);
+        }
+
+        function renderTvDisplay(bookings) {
+            const container = document.getElementById('tvScrollContainer');
+            if (!bookings || bookings.length === 0) {
+                container.innerHTML = `<div class="text-center py-20 text-zinc-500 font-medium">Tiada rekod tempahan aktif buat masa ini.</div>`;
+                return;
+            }
+
+            let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
+            bookings.forEach((b, index) => {
+                html += `
+                    <div class="bg-zinc-900 border border-yellow-600/30 rounded-xl p-5 shadow-lg relative overflow-hidden flex flex-col justify-between">
+                        <div class="absolute top-0 right-0 bg-yellow-500 text-black font-extrabold text-[10px] px-3 py-1 rounded-bl-xl uppercase">
+                            #${index + 1} • ${b.fasiliti}
+                        </div>
+                        <div class="space-y-2 mb-4">
+                            <div class="text-xs text-yellow-400 font-bold uppercase tracking-wider">${b.tarikh}</div>
+                            <div class="text-lg font-black text-white tracking-wide">${b.nama}</div>
+                        </div>
+                        <div class="flex items-center justify-between pt-3 border-t border-zinc-800 text-xs font-semibold text-zinc-300">
+                            <span class="bg-zinc-950 px-3 py-1.5 rounded-lg border border-zinc-800 text-yellow-400">⏱️ ${b.masaMula} - ${b.masaTamat}</span>
+                            <span class="text-zinc-500 text-[10px]">${b.timestamp || ''}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // Enjin Auto-Scroll Berprestasi Tinggi untuk TV (Smooth Continuous Ticker)
+        function initAutoScroll() {
+            const container = document.getElementById('tvScrollContainer');
+            let scrollDirection = 1; // 1 ke bawah, -1 ke atas
+            
+            setInterval(() => {
+                // Hanya jalankan auto-scroll jika tab TV sedang dibuka
+                if (document.getElementById('viewTv').classList.contains('hidden')) return;
+                
+                if (container.scrollHeight <= container.clientHeight) return;
+
+                container.scrollTop += scrollDirection * 0.8;
+
+                // Jika sampai ke bawah, tukar arah ke atas atau ulang dari atas
+                if (container.scrollTop + container.clientHeight >= container.scrollHeight - 2) {
+                    setTimeout(() => { container.scrollTop = 0; }, 1500); // Rehat sekejap di bawah sebelum mula semula dari atas
+                }
+            }, 30);
+        }
+    </script>
+</body>
+</html>
